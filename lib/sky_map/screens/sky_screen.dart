@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motion_sensors/motion_sensors.dart';
@@ -20,12 +18,13 @@ class _SkyScreenState extends State<SkyScreen> {
   @override
   void initState() {
     super.initState();
-
+    //print(dotenv.env['APP_ID']);
+    //print(dotenv.env['APP_SECRET']);
     motionSensors.absoluteOrientationUpdateInterval =
         Duration.microsecondsPerSecond ~/ 100;
     motionSensors.absoluteOrientation.listen((AbsoluteOrientationEvent event) {
       // Using roll and pitch for offset
-      print('Roll: ${event.roll}, Pitch: ${event.pitch}, Yaw: ${event.yaw}');
+      //print('Roll: ${event.roll}, Pitch: ${event.pitch}, Yaw: ${event.yaw}');
       final offset = Offset(event.roll * 400, event.pitch * 400);
       context.read<SkyBloc>().add(UpdateOffset(offset));
     });
@@ -44,9 +43,12 @@ class _SkyScreenState extends State<SkyScreen> {
             offset = state.offset;
           }
           return Center(
-            child: CustomPaint(
-              painter: SkyPainter(offset),
-              child: Container(),
+            child: Container(
+              color: Colors.black,
+              child: CustomPaint(
+                painter: SkyPainter(offset),
+                child: Container(),
+              ),
             ),
           );
         },

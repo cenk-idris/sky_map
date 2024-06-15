@@ -11,7 +11,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Sky Map',
       theme: ThemeData(
-        colorScheme: const ColorScheme.light(
+        colorScheme: const ColorScheme.dark(
           primary: Color.fromRGBO(72, 74, 126, 1),
         ),
       ),
