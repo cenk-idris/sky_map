@@ -7,6 +7,7 @@ class SkyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    print('Canvas size: w: ${size.width} and h: ${size.height}');
     Paint paint = Paint()
       ..color = Colors.red
       ..style = PaintingStyle.fill;

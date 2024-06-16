@@ -16,18 +16,26 @@ class SkyScreen extends StatefulWidget {
 
 class _SkyScreenState extends State<SkyScreen> {
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Size screenSize = MediaQuery.of(context).size;
+    print('Screen size: w: ${screenSize.width} and h: ${screenSize.height}');
+  }
+
+  @override
   void initState() {
     super.initState();
-    //print(dotenv.env['APP_ID']);
-    //print(dotenv.env['APP_SECRET']);
-    motionSensors.absoluteOrientationUpdateInterval =
-        Duration.microsecondsPerSecond ~/ 100;
-    motionSensors.absoluteOrientation.listen((AbsoluteOrientationEvent event) {
-      // Using roll and pitch for offset
-      //print('Roll: ${event.roll}, Pitch: ${event.pitch}, Yaw: ${event.yaw}');
-      final offset = Offset(event.roll * 400, event.pitch * 400);
-      context.read<SkyBloc>().add(UpdateOffset(offset));
-    });
+
+    context.read<SkyBloc>().add(FetchLocation());
+
+    // motionSensors.absoluteOrientationUpdateInterval =
+    //     Duration.microsecondsPerSecond ~/ 100;
+    // motionSensors.absoluteOrientation.listen((AbsoluteOrientationEvent event) {
+    //   // Using roll and pitch for offset
+    //   //print('Roll: ${event.roll}, Pitch: ${event.pitch}, Yaw: ${event.yaw}');
+    //   final offset = Offset(event.roll * 400, event.pitch * 400);
+    //   context.read<SkyBloc>().add(UpdateOffset(offset));
+    // });
   }
 
   @override
