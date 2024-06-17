@@ -1,2 +1,2 @@
-double canvasWidth = 2000;
+double canvasWidth = 800;
 double canvasHeight = 300;

@@ -4,6 +4,7 @@ import 'dart:ui';
 import '../constants.dart';
 
 class CelestialBody {
+  final String date;
   final String id;
   final String name;
   final double altitudeDegree;
@@ -14,6 +15,7 @@ class CelestialBody {
   final Offset coords;
 
   CelestialBody({
+    required this.date,
     required this.id,
     required this.name,
     required this.altitudeDegree,
@@ -37,6 +39,7 @@ class CelestialBody {
           azimuthDegree: azimuthDegree, altitudeDegree: altitudeDegree);
       //print(json);
       return CelestialBody(
+        date: json['date'] ?? 'Unknown',
         id: json['id'] ?? 'Unknown',
         name: json['name'] ?? 'Unknown',
         altitudeDegree: altitudeDegree,
@@ -50,6 +53,7 @@ class CelestialBody {
     } catch (e) {
       print('Error parsing CelestialObjects: $e');
       return CelestialBody(
+        date: '2000-00-00',
         id: 'Unknown',
         name: 'Unknown',
         altitudeDegree: 0.0,
@@ -70,10 +74,15 @@ Offset _mapToCanvasCoords(
   double altitudeRad = altitudeDegree * (pi / 180);
 
   double cartesianX = cos(altitudeRad) * sin(azimuthRad);
-  double cartesianY = sin(azimuthRad) * cos(altitudeRad);
+  double cartesianY = sin(altitudeRad);
 
-  double canvasX = ((cartesianX + 1) / 2) * canvasWidth;
-  double canvasY = ((1 - cartesianY) / 2) * canvasHeight;
+  // Old approach to map to 0-1
+  //double canvasX = ((cartesianX + 1) / 2) * canvasWidth;
+  //double canvasY = ((1 - cartesianY) / 2) * canvasHeight;
+
+  // Hopefully new approach
+  double canvasX = cartesianX * canvasWidth / 2;
+  double canvasY = cartesianY * canvasHeight / 2;
 
   return Offset(canvasX, canvasY);
 }

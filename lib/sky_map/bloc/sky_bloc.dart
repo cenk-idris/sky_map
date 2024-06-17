@@ -36,7 +36,7 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
           await BodiesApiService(event.position).getAllCelestialBodies();
       for (var body in celestialBodyList) {
         print(
-            'id: ${body.id}, name: ${body.name}, altitudeDeg: ${body.altitudeDegree}, azimuthDeg: ${body.azimuthDegree}, distanceKm: ${body.distanceKm}, magnitude: ${body.magnitude}, constellation: ${body.constellation}, Coords: (${body.coords.dx},${body.coords.dy})');
+            'date: ${body.date}, id: ${body.id}, name: ${body.name}, altitudeDeg: ${body.altitudeDegree}, azimuthDeg: ${body.azimuthDegree}, distanceKm: ${body.distanceKm}, magnitude: ${body.magnitude}, constellation: ${body.constellation}, Coords: (${body.coords.dx},${body.coords.dy})');
       }
       _celestialBodies = celestialBodyList;
       emit(SkyReady(event.position, _celestialBodies));
