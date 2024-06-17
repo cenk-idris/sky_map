@@ -19,10 +19,9 @@ class SkyPainter extends CustomPainter {
     // Draw celestial bodies
     for (var body in celestialBodyList) {
       //print(celestialBodyList.length);
+      Offset canvasCoords = body.coords;
       canvas.drawCircle(
-          Offset(body.coords.dx + offset.dx, body.coords.dy + offset.dy),
-          10,
-          paint);
+          canvasCoords.translate(offset.dx, offset.dy), 10, paint);
     }
 
     // Example shapes
