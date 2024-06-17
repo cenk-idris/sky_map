@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sky_map/app.dart';
 
 import 'package:sky_map/main.dart';
 

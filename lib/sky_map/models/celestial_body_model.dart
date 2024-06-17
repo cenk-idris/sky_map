@@ -1,18 +1,7 @@
 import 'dart:math';
+import 'dart:ui';
 
-//
-//
-//
-//
-//
-//
-
-//
-//
-//
-//
-//
-//
+import '../constants.dart';
 
 class CelestialBody {
   final String id;
@@ -22,8 +11,7 @@ class CelestialBody {
   final double distanceKm;
   final double magnitude;
   final String constellation;
-  double? cartesianX;
-  double? cartesianY;
+  final Offset coords;
 
   CelestialBody({
     required this.id,
@@ -33,26 +21,31 @@ class CelestialBody {
     required this.distanceKm,
     required this.magnitude,
     required this.constellation,
-  }) {
-    _calculateCartesianCoordinates();
-  }
+    required this.coords,
+  });
 
   factory CelestialBody.fromJson(Map<String, dynamic> json) {
     try {
+      double altitudeDegree = double.tryParse(
+              json['position']?['horizontal']?['altitude']?['degrees']) ??
+          0.0;
+      double azimuthDegree = double.tryParse(
+              json['position']?['horizontal']?['azimuth']?['degrees']) ??
+          0.0;
+
+      Offset coords = _mapToCanvasCoords(
+          azimuthDegree: azimuthDegree, altitudeDegree: altitudeDegree);
       //print(json);
       return CelestialBody(
         id: json['id'] ?? 'Unknown',
         name: json['name'] ?? 'Unknown',
-        altitudeDegree: double.tryParse(
-                json['position']?['horizontal']?['altitude']?['degrees']) ??
-            0.0,
-        azimuthDegree: double.tryParse(
-                json['position']?['horizontal']?['azimuth']?['degrees']) ??
-            0.0,
+        altitudeDegree: altitudeDegree,
+        azimuthDegree: azimuthDegree,
         distanceKm:
             double.tryParse(json['distance']?['fromEarth']?['km']) ?? 0.0,
         magnitude: json['extraInfo']?['magnitude'] ?? 0.0,
         constellation: json['position']?['constellation']?['name'] ?? 'Unknown',
+        coords: coords,
       );
     } catch (e) {
       print('Error parsing CelestialObjects: $e');
@@ -64,16 +57,23 @@ class CelestialBody {
         distanceKm: 0.0,
         magnitude: 0.0,
         constellation: 'Unknown',
+        coords: Offset.zero,
       );
     }
   }
+}
 
-  _calculateCartesianCoordinates() {
-    // Convert degrees to radian
-    double azimuthRad = azimuthDegree * (pi / 180);
-    double altitudeRad = altitudeDegree * (pi / 180);
+Offset _mapToCanvasCoords(
+    {required double azimuthDegree, required double altitudeDegree}) {
+  // Convert degrees to radian
+  double azimuthRad = azimuthDegree * (pi / 180);
+  double altitudeRad = altitudeDegree * (pi / 180);
 
-    cartesianX = cos(altitudeRad) * sin(azimuthRad);
-    cartesianY = sin(azimuthRad) * cos(altitudeRad);
-  }
+  double cartesianX = cos(altitudeRad) * sin(azimuthRad);
+  double cartesianY = sin(azimuthRad) * cos(altitudeRad);
+
+  double canvasX = ((cartesianX + 1) / 2) * canvasWidth;
+  double canvasY = ((1 - cartesianY) / 2) * canvasHeight;
+
+  return Offset(canvasX, canvasY);
 }

@@ -19,7 +19,7 @@ class _SkyScreenState extends State<SkyScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     Size screenSize = MediaQuery.of(context).size;
-    print('Screen size: w: ${screenSize.width} and h: ${screenSize.height}');
+    //print('Screen size: w: ${screenSize.width} and h: ${screenSize.height}');
   }
 
   @override
@@ -27,40 +27,57 @@ class _SkyScreenState extends State<SkyScreen> {
     super.initState();
 
     context.read<SkyBloc>().add(FetchLocation());
-
-    // motionSensors.absoluteOrientationUpdateInterval =
-    //     Duration.microsecondsPerSecond ~/ 100;
-    // motionSensors.absoluteOrientation.listen((AbsoluteOrientationEvent event) {
-    //   // Using roll and pitch for offset
-    //   //print('Roll: ${event.roll}, Pitch: ${event.pitch}, Yaw: ${event.yaw}');
-    //   final offset = Offset(event.roll * 400, event.pitch * 400);
-    //   context.read<SkyBloc>().add(UpdateOffset(offset));
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('AR-like Canvas'),
+        title: Text('Sky Map'),
       ),
       body: BlocBuilder<SkyBloc, SkyState>(
         builder: (context, state) {
-          Offset offset = Offset.zero;
-          if (state is SkyOffsetUpdated) {
-            offset = state.offset;
-          }
-          return Center(
-            child: Container(
+          if (state is SkyLoading) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state is SkyReady) {
+            _startListeningToSensors();
+            return Container(
               color: Colors.black,
               child: CustomPaint(
-                painter: SkyPainter(offset),
-                child: Container(),
+                size: Size.infinite,
+                painter: SkyPainter(Offset.zero, state.celestialBodies),
               ),
-            ),
-          );
+            );
+          } else if (state is SkyOffsetUpdated) {
+            return Container(
+              color: Colors.black,
+              child: CustomPaint(
+                size: Size.infinite,
+                painter: SkyPainter(state.offset, state.celestialBodies),
+              ),
+            );
+          } else if (state is SkyError) {
+            return Center(
+              child: Text(state.errorMessage),
+            );
+          } else {
+            return Container();
+          }
         },
       ),
     );
+  }
+
+  void _startListeningToSensors() {
+    motionSensors.absoluteOrientationUpdateInterval =
+        Duration.microsecondsPerSecond ~/ 100;
+    motionSensors.absoluteOrientation.listen((AbsoluteOrientationEvent event) {
+      // Using roll and pitch for offset
+      // print('Roll: ${event.roll}, Pitch: ${event.pitch}, Yaw: ${event.yaw}');
+      final offset = Offset(event.roll * 400, event.pitch * 400);
+      context.read<SkyBloc>().add(UpdateOffset(offset));
+    });
   }
 }

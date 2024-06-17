@@ -8,6 +8,8 @@ import 'package:sky_map/sky_map/services/location_service.dart';
 import '../models/celestial_body_model.dart';
 
 class SkyBloc extends Bloc<SkyEvent, SkyState> {
+  List<CelestialBody> _celestialBodies = [];
+
   SkyBloc() : super(SkyInitial()) {
     on<FetchLocation>(_onFetchLocation);
     on<FetchCelestialData>(_onFetchCelestialData);
@@ -34,14 +36,16 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
           await BodiesApiService(event.position).getAllCelestialBodies();
       for (var body in celestialBodyList) {
         print(
-            'id: ${body.id}, name: ${body.name}, altitudeDeg: ${body.altitudeDegree}, azimuthDeg: ${body.azimuthDegree}, distanceKm: ${body.distanceKm}, magnitude: ${body.magnitude}, constellation: ${body.constellation}, Coords: (${body.cartesianX},${body.cartesianY})');
+            'id: ${body.id}, name: ${body.name}, altitudeDeg: ${body.altitudeDegree}, azimuthDeg: ${body.azimuthDegree}, distanceKm: ${body.distanceKm}, magnitude: ${body.magnitude}, constellation: ${body.constellation}, Coords: (${body.coords.dx},${body.coords.dy})');
       }
+      _celestialBodies = celestialBodyList;
+      emit(SkyReady(event.position, _celestialBodies));
     } catch (e) {
       emit(SkyError('Failed to fetch celestial data: ${e.toString()}'));
     }
   }
 
   void _onUpdateOffset(UpdateOffset event, Emitter<SkyState> emit) {
-    emit(SkyOffsetUpdated(event.offset));
+    emit(SkyOffsetUpdated(event.offset, _celestialBodies));
   }
 }
