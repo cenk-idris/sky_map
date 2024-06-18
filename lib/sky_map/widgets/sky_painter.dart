@@ -37,9 +37,14 @@ class SkyPainter extends CustomPainter {
     }
 
     // Example shapes
-    //canvas.drawCircle(Offset(-100 + offset.dx, 100 + offset.dy), 50, paint);
-    //canvas.drawCircle(Offset(300 + offset.dx, 500 + offset.dy), 30, paint);
-    //canvas.drawCircle(Offset(600 + offset.dx, 300 + offset.dy), 40, paint);
+    // Circle visible when roll value is approx 0.00
+    canvas.drawCircle(Offset(210 + offset.dx, 350 + offset.dy), 50, paint);
+
+    // Circle visible when roll value is approx 1.57
+    canvas.drawCircle(Offset(1780 + offset.dx, 350 + offset.dy), 50, paint);
+
+    // Circle visible when roll value is approx 3.14
+    canvas.drawCircle(Offset(3350 + offset.dx, 350 + offset.dy), 50, paint);
   }
 
   @override
