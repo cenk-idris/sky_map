@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:motion_sensors/motion_sensors.dart';
 import 'package:sky_map/sky_map/bloc/sky_bloc.dart';
 import 'package:sky_map/sky_map/bloc/sky_event.dart';
@@ -16,6 +17,8 @@ class SkyScreen extends StatefulWidget {
 }
 
 class _SkyScreenState extends State<SkyScreen> {
+  double heading = 0.0;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -43,20 +46,23 @@ class _SkyScreenState extends State<SkyScreen> {
               child: CircularProgressIndicator(),
             );
           } else if (state is SkyReady) {
-            _startListeningToSensors();
+            _startListeningToCompass();
             return Container(
               color: Colors.black,
               child: CustomPaint(
                 size: Size.infinite,
-                painter: SkyPainter(Offset.zero, state.celestialBodies),
+                painter: SkyPainter(
+                  state.celestialBodies,
+                  heading,
+                ),
               ),
             );
-          } else if (state is SkyOffsetUpdated) {
+          } else if (state is SkyHeadingUpdated) {
             return Container(
               color: Colors.black,
               child: CustomPaint(
                 size: Size.infinite,
-                painter: SkyPainter(state.offset, state.celestialBodies),
+                painter: SkyPainter(state.celestialBodies, heading),
               ),
             );
           } else if (state is SkyError) {
@@ -71,14 +77,23 @@ class _SkyScreenState extends State<SkyScreen> {
     );
   }
 
-  void _startListeningToSensors() {
-    motionSensors.absoluteOrientationUpdateInterval =
-        Duration.microsecondsPerSecond ~/ 100;
-    motionSensors.absoluteOrientation.listen((AbsoluteOrientationEvent event) {
-      // Using roll and pitch for offset
-      print('Roll: ${event.roll}, Pitch: ${event.pitch}, Yaw: ${event.yaw}');
-      final offset = Offset(event.roll * 1000, event.pitch * 1000);
-      context.read<SkyBloc>().add(UpdateOffset(offset));
+  void _startListeningToCompass() {
+    FlutterCompass.events?.listen((direction) {
+      heading = direction.heading ?? 0.0;
+      //print(offset);
+      print(direction.heading);
+      context.read<SkyBloc>().add(UpdateHeading(heading));
     });
   }
+
+  // void _startListeningToSensors() {
+  //   motionSensors.absoluteOrientationUpdateInterval =
+  //       Duration.microsecondsPerSecond ~/ 100;
+  //   motionSensors.absoluteOrientation.listen((AbsoluteOrientationEvent event) {
+  //     // Using roll and pitch for offset
+  //     print('Roll: ${event.roll}, Pitch: ${event.pitch}, Yaw: ${event.yaw}');
+  //     final offset = Offset(event.roll * 1000, event.pitch * 1000);
+  //     context.read<SkyBloc>().add(UpdateHeading(offset));
+  //   });
+  // }
 }

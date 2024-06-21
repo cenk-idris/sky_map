@@ -9,11 +9,12 @@ import '../models/celestial_body_model.dart';
 
 class SkyBloc extends Bloc<SkyEvent, SkyState> {
   List<CelestialBody> _celestialBodies = [];
+  Position? position;
 
   SkyBloc() : super(SkyInitial()) {
     on<FetchLocation>(_onFetchLocation);
     on<FetchCelestialData>(_onFetchCelestialData);
-    on<UpdateOffset>(_onUpdateOffset);
+    on<UpdateHeading>(_onUpdateOffset);
   }
 
   void _onFetchLocation(FetchLocation event, Emitter<SkyState> emit) async {
@@ -21,8 +22,12 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
     emit(SkyLoading());
     // Then request locations
     try {
-      Position position = await determinePosition();
-      add(FetchCelestialData(position));
+      position = await determinePosition();
+      if (position != null) {
+        add(FetchCelestialData(position!));
+      } else {
+        throw Exception('Position empty');
+      }
     } catch (e) {
       emit(SkyError('Failed to fetch location'));
     }
@@ -45,7 +50,7 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
     }
   }
 
-  void _onUpdateOffset(UpdateOffset event, Emitter<SkyState> emit) {
-    emit(SkyOffsetUpdated(event.offset, _celestialBodies));
+  void _onUpdateOffset(UpdateHeading event, Emitter<SkyState> emit) {
+    emit(SkyHeadingUpdated(event.heading, _celestialBodies));
   }
 }

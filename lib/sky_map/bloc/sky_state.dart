@@ -17,11 +17,11 @@ class SkyReady extends SkyState {
   SkyReady(this.position, this.celestialBodies);
 }
 
-class SkyOffsetUpdated extends SkyState {
-  final Offset offset;
+class SkyHeadingUpdated extends SkyState {
+  final double heading;
   final List<CelestialBody> celestialBodies;
 
-  SkyOffsetUpdated(this.offset, this.celestialBodies);
+  SkyHeadingUpdated(this.heading, this.celestialBodies);
 }
 
 class SkyError extends SkyState {

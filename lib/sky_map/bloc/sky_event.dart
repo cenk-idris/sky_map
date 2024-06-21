@@ -4,10 +4,10 @@ import 'package:geolocator/geolocator.dart';
 
 abstract class SkyEvent {}
 
-class UpdateOffset extends SkyEvent {
-  final Offset offset;
+class UpdateHeading extends SkyEvent {
+  final double heading;
 
-  UpdateOffset(this.offset);
+  UpdateHeading(this.heading);
 }
 
 class FetchLocation extends SkyEvent {}
