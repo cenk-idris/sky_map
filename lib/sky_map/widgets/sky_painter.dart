@@ -26,6 +26,8 @@ class SkyPainter extends CustomPainter {
     final canvasCenterY = size.height / 2;
     print(size.height);
 
+    _drawAltitudeLine(canvas, size, paint);
+
     // Draw celestial bodies
     for (var body in celestialBodyList) {
       double adjustedX =
@@ -50,6 +52,31 @@ class SkyPainter extends CustomPainter {
     _drawCircleAtDegree(canvas, size, paint, 90, 10.0, '90°');
     _drawCircleAtDegree(canvas, size, paint, 180, 10.0, '180°');
     _drawCircleAtDegree(canvas, size, paint, 270, 10.0, '270°');
+  }
+
+  void _drawAltitudeLine(Canvas canvas, Size size, Paint paint) {
+    // Calculate the center of the canvas height
+    double centerY = size.height / 2;
+
+    // Create the start and end points of the line
+    Offset start = Offset(0, centerY);
+    Offset end = Offset(size.width, centerY);
+
+    // Draw the line
+    canvas.drawLine(start, end, paint);
+
+    // Create a TextPainter for the label
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: '0° Altitude',
+        style: TextStyle(color: Colors.white, fontSize: 10),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+
+    // Layout and draw the text
+    textPainter.layout();
+    textPainter.paint(canvas, Offset(size.width / 2, centerY - 15));
   }
 
   void _drawCircleAtDegree(Canvas canvas, Size size, Paint paint, double degree,

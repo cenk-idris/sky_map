@@ -74,7 +74,7 @@ Offset _mapToCanvasCoords(
   double altitudeRad = altitudeDegree * (pi / 180);
 
   double cartesianX = cos(altitudeRad) * sin(azimuthRad);
-  double cartesianY = sin(altitudeRad);
+  double cartesianY = sin(altitudeRad) * cos(azimuthRad);
 
   // Old approach to map to 0-1
   //double canvasX = ((cartesianX + 1) / 2) * canvasWidth;
