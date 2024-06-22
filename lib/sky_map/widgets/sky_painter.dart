@@ -32,8 +32,12 @@ class SkyPainter extends CustomPainter {
     for (var body in celestialBodyList) {
       double adjustedX =
           canvasCenterX + body.coords.dx - (heading / 360) * canvasWidth;
-      double adjustedY = canvasCenterY + body.coords.dy;
+      double adjustedY = canvasCenterY - body.coords.dy;
       Offset position = Offset(adjustedX, adjustedY);
+      if (body.name == 'Moon') {
+        print('AltDeg: ${body.altitudeDegree}, Coords: ${body.coords}');
+        print('${body.name} = $position');
+      }
       //print(position);
       canvas.drawCircle(position, 5, paint);
 
