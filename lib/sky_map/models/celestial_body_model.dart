@@ -7,6 +7,8 @@ class CelestialBody {
   final String date;
   final String id;
   final String name;
+  final double rightAscensionHours;
+  final double declinationDegrees;
   final double altitudeDegree;
   final double azimuthDegree;
   final double distanceKm;
@@ -18,6 +20,8 @@ class CelestialBody {
     required this.date,
     required this.id,
     required this.name,
+    required this.rightAscensionHours,
+    required this.declinationDegrees,
     required this.altitudeDegree,
     required this.azimuthDegree,
     required this.distanceKm,
@@ -28,6 +32,12 @@ class CelestialBody {
 
   factory CelestialBody.fromJson(Map<String, dynamic> json) {
     try {
+      double rightAscensionHours = double.tryParse(
+              json['position']?['equatorial']?['rightAscension']?['hours']) ??
+          0.0;
+      double declinationDegrees = double.tryParse(
+              json['position']?['equatorial']?['declination']?['degrees']) ??
+          0.0;
       double altitudeDegree = double.tryParse(
               json['position']?['horizontal']?['altitude']?['degrees']) ??
           0.0;
@@ -42,6 +52,8 @@ class CelestialBody {
         date: json['date'] ?? 'Unknown',
         id: json['id'] ?? 'Unknown',
         name: json['name'] ?? 'Unknown',
+        rightAscensionHours: rightAscensionHours,
+        declinationDegrees: declinationDegrees,
         altitudeDegree: altitudeDegree,
         azimuthDegree: azimuthDegree,
         distanceKm:
@@ -56,6 +68,8 @@ class CelestialBody {
         date: '2000-00-00',
         id: 'Unknown',
         name: 'Unknown',
+        rightAscensionHours: 0.0,
+        declinationDegrees: 0.0,
         altitudeDegree: 0.0,
         azimuthDegree: 0.0,
         distanceKm: 0.0,
@@ -74,7 +88,7 @@ Offset _mapToCanvasCoords(
   double altitudeRad = altitudeDegree * (pi / 180);
 
   double cartesianX = cos(altitudeRad) * sin(azimuthRad);
-  double cartesianY = sin(altitudeRad) * cos(azimuthRad);
+  double cartesianY = sin(altitudeRad);
 
   // Old approach to map to 0-1
   //double canvasX = ((cartesianX + 1) / 2) * canvasWidth;

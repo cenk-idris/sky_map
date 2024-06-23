@@ -51,10 +51,8 @@ class _SkyScreenState extends State<SkyScreen> {
               color: Colors.black,
               child: CustomPaint(
                 size: Size.infinite,
-                painter: SkyPainter(
-                  state.celestialBodies,
-                  heading,
-                ),
+                painter: SkyPainter(state.celestialBodies, heading,
+                    context.read<SkyBloc>().localSiderealTime!),
               ),
             );
           } else if (state is SkyHeadingUpdated) {
@@ -62,7 +60,11 @@ class _SkyScreenState extends State<SkyScreen> {
               color: Colors.black,
               child: CustomPaint(
                 size: Size.infinite,
-                painter: SkyPainter(state.celestialBodies, heading),
+                painter: SkyPainter(
+                  state.celestialBodies,
+                  heading,
+                  context.read<SkyBloc>().localSiderealTime!,
+                ),
               ),
             );
           } else if (state is SkyError) {

@@ -10,11 +10,13 @@ import '../models/celestial_body_model.dart';
 class SkyBloc extends Bloc<SkyEvent, SkyState> {
   List<CelestialBody> _celestialBodies = [];
   Position? position;
+  double? localSiderealTime;
+  double heading = 0.0;
 
   SkyBloc() : super(SkyInitial()) {
     on<FetchLocation>(_onFetchLocation);
     on<FetchCelestialData>(_onFetchCelestialData);
-    on<UpdateHeading>(_onUpdateOffset);
+    on<UpdateHeading>(_onUpdateHeading);
   }
 
   void _onFetchLocation(FetchLocation event, Emitter<SkyState> emit) async {
@@ -24,6 +26,10 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
     try {
       position = await determinePosition();
       if (position != null) {
+        final now = DateTime.now().toUtc();
+        localSiderealTime = calculateLST(now, position!.longitude);
+        print('Local Sidereal Time: $localSiderealTime');
+        print('Position: $position');
         add(FetchCelestialData(position!));
       } else {
         throw Exception('Position empty');
@@ -41,7 +47,7 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
           await BodiesApiService(event.position).getAllCelestialBodies();
       for (var body in celestialBodyList) {
         print(
-            'date: ${body.date}, id: ${body.id}, name: ${body.name}, altitudeDeg: ${body.altitudeDegree}, azimuthDeg: ${body.azimuthDegree}, distanceKm: ${body.distanceKm}, magnitude: ${body.magnitude}, constellation: ${body.constellation}, Coords: (${body.coords.dx},${body.coords.dy})');
+            'date: ${body.date}, id: ${body.id}, name: ${body.name}, rAH: ${body.rightAscensionHours}, dec: ${body.declinationDegrees} altitudeDeg: ${body.altitudeDegree}, azimuthDeg: ${body.azimuthDegree}, distanceKm: ${body.distanceKm}, magnitude: ${body.magnitude}, constellation: ${body.constellation}, Coords: (${body.coords.dx},${body.coords.dy})');
       }
       _celestialBodies = celestialBodyList;
       emit(SkyReady(event.position, _celestialBodies));
@@ -50,7 +56,26 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
     }
   }
 
-  void _onUpdateOffset(UpdateHeading event, Emitter<SkyState> emit) {
+  void _onUpdateHeading(UpdateHeading event, Emitter<SkyState> emit) {
     emit(SkyHeadingUpdated(event.heading, _celestialBodies));
+  }
+
+  double calculateLST(DateTime now, double longitude) {
+    final jd = _toJulianDate(now);
+    print('Julian date: $jd');
+    final s = jd - 2451545.0;
+    final t = s / 36525.0;
+    final t0 = 6.697374558 + (2400.051336 * t) + (0.000025862 * t * t);
+    final gst = t0 +
+        (now.hour + (now.minute / 60.0) + (now.second / 3600.0)) * 1.002737909;
+
+    double lst = (gst + longitude / 15.0) % 24.0;
+    if (lst < 0) lst += 24.0;
+
+    return lst;
+  }
+
+  double _toJulianDate(DateTime date) {
+    return date.millisecondsSinceEpoch / 86400000.0 + 2440587.5;
   }
 }

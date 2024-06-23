@@ -7,8 +7,9 @@ import '../models/celestial_body_model.dart';
 class SkyPainter extends CustomPainter {
   final List<CelestialBody> celestialBodyList;
   final double heading;
+  final double localSiderealTime;
 
-  SkyPainter(this.celestialBodyList, this.heading);
+  SkyPainter(this.celestialBodyList, this.heading, this.localSiderealTime);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -35,8 +36,8 @@ class SkyPainter extends CustomPainter {
       double adjustedY = canvasCenterY - body.coords.dy;
       Offset position = Offset(adjustedX, adjustedY);
       if (body.name == 'Moon') {
-        print('AltDeg: ${body.altitudeDegree}, Coords: ${body.coords}');
-        print('${body.name} = $position');
+        //print('AltDeg: ${body.altitudeDegree}, Coords: ${body.coords}');
+        //print('${body.name} = $position');
       }
       //print(position);
       canvas.drawCircle(position, 5, paint);
@@ -67,7 +68,7 @@ class SkyPainter extends CustomPainter {
     Offset end = Offset(size.width, centerY);
 
     // Draw the line
-    canvas.drawLine(start, end, paint);
+    canvas.drawLine(start, start, paint);
 
     // Create a TextPainter for the label
     final textPainter = TextPainter(
@@ -80,7 +81,7 @@ class SkyPainter extends CustomPainter {
 
     // Layout and draw the text
     textPainter.layout();
-    textPainter.paint(canvas, Offset(size.width / 2, centerY - 15));
+    textPainter.paint(canvas, Offset(0, centerY - 15));
   }
 
   void _drawCircleAtDegree(Canvas canvas, Size size, Paint paint, double degree,
