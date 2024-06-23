@@ -46,7 +46,8 @@ class CelestialBody {
           0.0;
 
       Offset coords = _mapToCanvasCoords(
-          azimuthDegree: azimuthDegree, altitudeDegree: altitudeDegree);
+          rightAscensionHours: rightAscensionHours,
+          declinationDegrees: declinationDegrees);
       //print(json);
       return CelestialBody(
         date: json['date'] ?? 'Unknown',
@@ -82,21 +83,15 @@ class CelestialBody {
 }
 
 Offset _mapToCanvasCoords(
-    {required double azimuthDegree, required double altitudeDegree}) {
-  // Convert degrees to radian
-  double azimuthRad = azimuthDegree * (pi / 180);
-  double altitudeRad = altitudeDegree * (pi / 180);
+    {required double rightAscensionHours, required double declinationDegrees}) {
+  // Convert RA from hours to degrees
+  double raDegrees = rightAscensionHours * 15; // 1 hour is 15 deg (360 / 24)
 
-  double cartesianX = cos(altitudeRad) * sin(azimuthRad);
-  double cartesianY = sin(altitudeRad);
+  // Normalize and scale RA to canvas width
+  double x = (raDegrees / 360) * canvasWidth;
 
-  // Old approach to map to 0-1
-  //double canvasX = ((cartesianX + 1) / 2) * canvasWidth;
-  //double canvasY = ((1 - cartesianY) / 2) * canvasHeight;
+  // Normalize and scale DEC to canvas height
+  double y = declinationDegrees;
 
-  // Hopefully new approach
-  double canvasX = cartesianX * canvasWidth / 2;
-  double canvasY = cartesianY * canvasHeight / 2;
-
-  return Offset(canvasX, canvasY);
+  return Offset(x, y);
 }

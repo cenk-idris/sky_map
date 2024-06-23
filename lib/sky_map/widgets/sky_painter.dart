@@ -25,16 +25,21 @@ class SkyPainter extends CustomPainter {
 
     final canvasCenterX = canvasWidth / 2;
     final canvasCenterY = size.height / 2;
-    print(size.height);
+    print('height: ${size.height}');
 
     _drawAltitudeLine(canvas, size, paint);
 
     // Draw celestial bodies
     for (var body in celestialBodyList) {
-      double adjustedX =
-          canvasCenterX + body.coords.dx - (heading / 360) * canvasWidth;
-      double adjustedY = canvasCenterY - body.coords.dy;
+      double adjustedX = (body.coords.dx -
+              ((heading - localSiderealTime * 15) / 360) * canvasWidth) %
+          canvasWidth;
+      if (adjustedX < 0) {
+        adjustedX += canvasWidth;
+      }
+      double adjustedY = canvasCenterY - (body.coords.dy / 180.0 * size.height);
       Offset position = Offset(adjustedX, adjustedY);
+      print(position);
       if (body.name == 'Moon') {
         //print('AltDeg: ${body.altitudeDegree}, Coords: ${body.coords}');
         //print('${body.name} = $position');
@@ -73,7 +78,7 @@ class SkyPainter extends CustomPainter {
     // Create a TextPainter for the label
     final textPainter = TextPainter(
       text: TextSpan(
-        text: '0° Altitude',
+        text: '0° Declination',
         style: TextStyle(color: Colors.white, fontSize: 10),
       ),
       textDirection: TextDirection.ltr,
