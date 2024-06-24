@@ -37,10 +37,6 @@ class StarsApiService {
         throw Exception(response.statusCode);
       }
     }
-    for (var star in starsList) {
-      print(
-          'Stars name: ${star.name}, constell: ${star.constellation}, RA: ${star.rightAscensionHours}');
-    }
 
     return starsList;
   }

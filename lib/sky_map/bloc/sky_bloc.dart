@@ -11,6 +11,7 @@ import '../models/star_model.dart';
 
 class SkyBloc extends Bloc<SkyEvent, SkyState> {
   List<CelestialBody> _celestialBodies = [];
+  List<Star> _starsList = [];
 
   Position? position;
   double? localSiderealTime;
@@ -53,19 +54,26 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
           await BodiesApiService(event.position).getAllCelestialBodies();
       StarsApiService().buildUrl('Ursa Minor');
 
+      /////////// For printing stars and celestial bodies ////////////////
+      for (var star in starList) {
+        print(
+            'Stars name: ${star.name}, constell: ${star.constellation}, RA: ${star.rightAscensionHours}, DEC: ${star.declinationDegrees}, apMag: ${star.apparentMagnitude}, distLightYear: ${star.distanceLightYear}');
+      }
       for (var body in celestialBodyList) {
         print(
             'date: ${body.date}, id: ${body.id}, name: ${body.name}, rAH: ${body.rightAscensionHours}, dec: ${body.declinationDegrees} altitudeDeg: ${body.altitudeDegree}, azimuthDeg: ${body.azimuthDegree}, distanceKm: ${body.distanceKm}, magnitude: ${body.magnitude}, constellation: ${body.constellation}, Coords: (${body.coords.dx},${body.coords.dy})');
       }
+      ////////////////////////////////////////////////////////////////////
+      _starsList = starList;
       _celestialBodies = celestialBodyList;
-      emit(SkyReady(event.position, _celestialBodies));
+      emit(SkyReady(event.position, _celestialBodies, _starsList));
     } catch (e) {
       emit(SkyError('Failed to fetch celestial data: ${e.toString()}'));
     }
   }
 
   void _onUpdateHeading(UpdateHeading event, Emitter<SkyState> emit) {
-    emit(SkyHeadingUpdated(event.heading, _celestialBodies));
+    emit(SkyHeadingUpdated(event.heading, _celestialBodies, _starsList));
   }
 
   double calculateLST(DateTime now, double longitude) {

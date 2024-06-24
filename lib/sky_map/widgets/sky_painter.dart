@@ -3,19 +3,27 @@ import 'package:sky_map/sky_map/constants.dart';
 
 import '../bloc/sky_state.dart';
 import '../models/celestial_body_model.dart';
+import '../models/star_model.dart';
 
 class SkyPainter extends CustomPainter {
   final List<CelestialBody> celestialBodyList;
+  final List<Star> starList;
   final double heading;
   final double localSiderealTime;
 
-  SkyPainter(this.celestialBodyList, this.heading, this.localSiderealTime);
+  SkyPainter(this.celestialBodyList, this.starList, this.heading,
+      this.localSiderealTime);
 
   @override
   void paint(Canvas canvas, Size size) {
     //print('Canvas size: w: ${size.width} and h: ${size.height}');
-    Paint paint = Paint()
+    Paint planetPainter = Paint()
       ..color = Colors.red
+      ..strokeWidth = 2
+      ..style = PaintingStyle.fill;
+
+    Paint starPainter = Paint()
+      ..color = Colors.white
       ..strokeWidth = 2
       ..style = PaintingStyle.fill;
 
@@ -25,9 +33,33 @@ class SkyPainter extends CustomPainter {
 
     final canvasCenterX = canvasWidth / 2;
     final canvasCenterY = size.height / 2;
-    print('height: ${size.height}');
+    //print('height: ${size.height}');
 
-    _drawAltitudeLine(canvas, size, paint);
+    _drawAltitudeLine(canvas, size, planetPainter);
+
+    // Draw stars
+    for (var star in starList) {
+      double adjustedX = (star.coords.dx -
+              ((heading - localSiderealTime * 15) / 360) * canvasWidth) %
+          canvasWidth;
+      if (adjustedX < 0) {
+        adjustedX += canvasWidth;
+      }
+
+      double adjustedY = canvasCenterY - (star.coords.dy / 180.0 * size.height);
+
+      Offset position = Offset(adjustedX, adjustedY);
+
+      canvas.drawCircle(position, 2, starPainter);
+
+      textPainter.text = TextSpan(
+        text: star.name,
+        style: TextStyle(color: Colors.white, fontSize: 10),
+      );
+
+      textPainter.layout();
+      textPainter.paint(canvas, position + Offset(5, -5));
+    }
 
     // Draw celestial bodies
     for (var body in celestialBodyList) {
@@ -39,13 +71,7 @@ class SkyPainter extends CustomPainter {
       }
       double adjustedY = canvasCenterY - (body.coords.dy / 180.0 * size.height);
       Offset position = Offset(adjustedX, adjustedY);
-      print(position);
-      if (body.name == 'Moon') {
-        //print('AltDeg: ${body.altitudeDegree}, Coords: ${body.coords}');
-        //print('${body.name} = $position');
-      }
-      //print(position);
-      canvas.drawCircle(position, 5, paint);
+      canvas.drawCircle(position, 5, planetPainter);
 
       textPainter.text = TextSpan(
         text: body.name,
@@ -58,10 +84,10 @@ class SkyPainter extends CustomPainter {
 
     // Example shapes
     // Draw example shapes based on specific degrees
-    _drawCircleAtDegree(canvas, size, paint, 0, 10.0, '0°');
-    _drawCircleAtDegree(canvas, size, paint, 90, 10.0, '90°');
-    _drawCircleAtDegree(canvas, size, paint, 180, 10.0, '180°');
-    _drawCircleAtDegree(canvas, size, paint, 270, 10.0, '270°');
+    _drawCircleAtDegree(canvas, size, planetPainter, 0, 10.0, '0°');
+    _drawCircleAtDegree(canvas, size, planetPainter, 90, 10.0, '90°');
+    _drawCircleAtDegree(canvas, size, planetPainter, 180, 10.0, '180°');
+    _drawCircleAtDegree(canvas, size, planetPainter, 270, 10.0, '270°');
   }
 
   void _drawAltitudeLine(Canvas canvas, Size size, Paint paint) {
