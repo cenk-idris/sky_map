@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:sky_map/sky_map/constants.dart';
 
 import '../models/star_model.dart';
 
@@ -13,17 +16,32 @@ class StarsApiService {
     return uri;
   }
 
-  Future<List<Star>> getAllStars() async {
-    // We will be making at least 3 request to grab
-    final response =
-        await http.get(buildUrl('Ursa Minor'), headers: {'X-Api-Key': apiKey});
+  Future<List<Star>> getAllStarsInConstellation() async {
+    // We will be making at least 3 request to fill the starsList
+    // with different constellations
+    List<Star> starsList = [];
 
-    if (response.statusCode == 200) {
-      print(response.body);
-    } else {
-      throw Exception(response.statusCode);
+    for (var constellation in constellationStars.keys) {
+      final response = await http
+          .get(buildUrl(constellation), headers: {'X-Api-Key': apiKey});
+
+      if (response.statusCode == 200) {
+        final List<dynamic> parsedJson = jsonDecode(response.body);
+
+        for (var starJson in parsedJson) {
+          if (constellationStars[constellation]!.contains(starJson['name'])) {
+            starsList.add(Star.fromJson(starJson));
+          }
+        }
+      } else {
+        throw Exception(response.statusCode);
+      }
+    }
+    for (var star in starsList) {
+      print(
+          'Stars name: ${star.name}, constell: ${star.constellation}, RA: ${star.rightAscensionHours}');
     }
 
-    return [];
+    return starsList;
   }
 }

@@ -46,10 +46,13 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
       FetchCelestialData event, Emitter<SkyState> emit) async {
     try {
       // Get API url and credentials from .env
+      List<Star> starList =
+          await StarsApiService().getAllStarsInConstellation();
+
       List<CelestialBody> celestialBodyList =
           await BodiesApiService(event.position).getAllCelestialBodies();
       StarsApiService().buildUrl('Ursa Minor');
-      List<Star> starList = await StarsApiService().getAllStars();
+
       for (var body in celestialBodyList) {
         print(
             'date: ${body.date}, id: ${body.id}, name: ${body.name}, rAH: ${body.rightAscensionHours}, dec: ${body.declinationDegrees} altitudeDeg: ${body.altitudeDegree}, azimuthDeg: ${body.azimuthDegree}, distanceKm: ${body.distanceKm}, magnitude: ${body.magnitude}, constellation: ${body.constellation}, Coords: (${body.coords.dx},${body.coords.dy})');
