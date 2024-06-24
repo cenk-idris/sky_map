@@ -4,11 +4,14 @@ import 'package:sky_map/sky_map/bloc/sky_event.dart';
 import 'package:sky_map/sky_map/bloc/sky_state.dart';
 import 'package:sky_map/sky_map/services/bodies_api_service.dart';
 import 'package:sky_map/sky_map/services/location_service.dart';
+import 'package:sky_map/sky_map/services/stars_api_service.dart';
 
 import '../models/celestial_body_model.dart';
+import '../models/star_model.dart';
 
 class SkyBloc extends Bloc<SkyEvent, SkyState> {
   List<CelestialBody> _celestialBodies = [];
+
   Position? position;
   double? localSiderealTime;
   double heading = 0.0;
@@ -45,6 +48,8 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
       // Get API url and credentials from .env
       List<CelestialBody> celestialBodyList =
           await BodiesApiService(event.position).getAllCelestialBodies();
+      StarsApiService().buildUrl('Ursa Minor');
+      List<Star> starList = await StarsApiService().getAllStars();
       for (var body in celestialBodyList) {
         print(
             'date: ${body.date}, id: ${body.id}, name: ${body.name}, rAH: ${body.rightAscensionHours}, dec: ${body.declinationDegrees} altitudeDeg: ${body.altitudeDegree}, azimuthDeg: ${body.azimuthDegree}, distanceKm: ${body.distanceKm}, magnitude: ${body.magnitude}, constellation: ${body.constellation}, Coords: (${body.coords.dx},${body.coords.dy})');
