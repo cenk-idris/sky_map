@@ -8,6 +8,7 @@ import 'package:sky_map/sky_map/constants.dart';
 import 'package:sky_map/sky_map/widgets/sky_painter.dart';
 
 import '../bloc/sky_state.dart';
+import '../models/celestial_body_model.dart';
 
 class SkyScreen extends StatefulWidget {
   const SkyScreen({super.key});
@@ -39,43 +40,62 @@ class _SkyScreenState extends State<SkyScreen> {
       appBar: AppBar(
         title: Text('Sky Map'),
       ),
-      body: BlocBuilder<SkyBloc, SkyState>(
-        builder: (context, state) {
-          if (state is SkyLoading) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is SkyReady) {
-            _startListeningToCompass();
-            return Container(
-              color: Colors.black,
-              child: CustomPaint(
-                size: Size.infinite,
-                painter: SkyPainter(state.celestialBodies, state.starList,
-                    heading, context.read<SkyBloc>().localSiderealTime!),
-              ),
-            );
-          } else if (state is SkyHeadingUpdated) {
-            return Container(
-              color: Colors.black,
-              child: CustomPaint(
-                size: Size.infinite,
-                painter: SkyPainter(
-                  state.celestialBodies,
-                  state.starList,
-                  heading,
-                  context.read<SkyBloc>().localSiderealTime!,
-                ),
-              ),
-            );
-          } else if (state is SkyError) {
-            return Center(
-              child: Text(state.errorMessage),
-            );
-          } else {
-            return Container();
+      body: BlocListener<SkyBloc, SkyState>(
+        listener: (context, state) {
+          if (state is SkyCelestialBodyTapped) {
+            _showPlanetInfo(context, state.tappedBody);
           }
         },
+        child: BlocBuilder<SkyBloc, SkyState>(
+          builder: (context, state) {
+            if (state is SkyLoading) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is SkyReady) {
+              _startListeningToCompass();
+              return GestureDetector(
+                onTapUp: (details) {},
+                child: Container(
+                  color: Colors.black,
+                  child: CustomPaint(
+                    size: Size.infinite,
+                    painter: SkyPainter(state.celestialBodies, state.starList,
+                        heading, context.read<SkyBloc>().localSiderealTime!),
+                  ),
+                ),
+              );
+            } else if (state is SkyHeadingUpdated) {
+              return GestureDetector(
+                onTapUp: (details) {
+                  //print('Local: ${details.localPosition}');
+                  //print('Global: ${details.globalPosition}');
+                  context
+                      .read<SkyBloc>()
+                      .add(TapOnCelestialBody(details.localPosition));
+                },
+                child: Container(
+                  color: Colors.black,
+                  child: CustomPaint(
+                    size: Size.infinite,
+                    painter: SkyPainter(
+                      state.celestialBodies,
+                      state.starList,
+                      heading,
+                      context.read<SkyBloc>().localSiderealTime!,
+                    ),
+                  ),
+                ),
+              );
+            } else if (state is SkyError) {
+              return Center(
+                child: Text(state.errorMessage),
+              );
+            } else {
+              return Container();
+            }
+          },
+        ),
       ),
     );
   }
@@ -84,9 +104,26 @@ class _SkyScreenState extends State<SkyScreen> {
     FlutterCompass.events?.listen((direction) {
       heading = direction.heading ?? 0.0;
       //print(offset);
-      print(direction.heading);
+      //print(direction.heading);
       context.read<SkyBloc>().add(UpdateHeading(heading));
     });
+  }
+
+  void _showPlanetInfo(BuildContext context, CelestialBody body) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(body.name),
+        content: Text(
+            'Magnitude: ${body.magnitude}\nDistance: ${body.distanceKm} km\nConstellation: ${body.constellation}'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   // void _startListeningToSensors() {

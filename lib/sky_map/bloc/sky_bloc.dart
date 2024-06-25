@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sky_map/sky_map/bloc/sky_event.dart';
@@ -6,6 +8,7 @@ import 'package:sky_map/sky_map/services/bodies_api_service.dart';
 import 'package:sky_map/sky_map/services/location_service.dart';
 import 'package:sky_map/sky_map/services/stars_api_service.dart';
 
+import '../constants.dart';
 import '../models/celestial_body_model.dart';
 import '../models/star_model.dart';
 
@@ -14,13 +17,28 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
   List<Star> _starsList = [];
 
   Position? position;
-  double? localSiderealTime;
+  double localSiderealTime = 0.0;
   double heading = 0.0;
 
   SkyBloc() : super(SkyInitial()) {
     on<FetchLocation>(_onFetchLocation);
     on<FetchCelestialData>(_onFetchCelestialData);
     on<UpdateHeading>(_onUpdateHeading);
+    on<TapOnCelestialBody>(_onTapOnCelestialBody);
+  }
+
+  void _onTapOnCelestialBody(
+      TapOnCelestialBody event, Emitter<SkyState> emit) async {
+    CelestialBody? tappedBody;
+    print(event.tapPosition);
+
+    for (var body in _celestialBodies) {
+      print('${body.name}: ${body.adjustedCoords}');
+      if ((body.adjustedCoords - event.tapPosition).distance < 20) {
+        print('Tapped on ${body.name}');
+        emit(SkyCelestialBodyTapped(body));
+      }
+    }
   }
 
   void _onFetchLocation(FetchLocation event, Emitter<SkyState> emit) async {

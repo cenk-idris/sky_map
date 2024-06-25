@@ -32,3 +32,9 @@ class SkyError extends SkyState {
 
   SkyError(this.errorMessage);
 }
+
+class SkyCelestialBodyTapped extends SkyState {
+  final CelestialBody tappedBody;
+
+  SkyCelestialBodyTapped(this.tappedBody);
+}

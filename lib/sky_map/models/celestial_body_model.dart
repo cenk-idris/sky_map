@@ -15,6 +15,7 @@ class CelestialBody {
   final double magnitude;
   final String constellation;
   final Offset coords;
+  Offset adjustedCoords;
 
   CelestialBody({
     required this.date,
@@ -28,6 +29,7 @@ class CelestialBody {
     required this.magnitude,
     required this.constellation,
     required this.coords,
+    required this.adjustedCoords,
   });
 
   factory CelestialBody.fromJson(Map<String, dynamic> json) {
@@ -62,6 +64,7 @@ class CelestialBody {
         magnitude: json['extraInfo']?['magnitude'] ?? 0.0,
         constellation: json['position']?['constellation']?['name'] ?? 'Unknown',
         coords: coords,
+        adjustedCoords: coords,
       );
     } catch (e) {
       print('Error parsing CelestialObjects: $e');
@@ -77,6 +80,7 @@ class CelestialBody {
         magnitude: 0.0,
         constellation: 'Unknown',
         coords: Offset.zero,
+        adjustedCoords: Offset.zero,
       );
     }
   }

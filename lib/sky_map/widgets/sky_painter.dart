@@ -32,7 +32,7 @@ class SkyPainter extends CustomPainter {
     );
 
     final canvasCenterX = canvasWidth / 2;
-    final canvasCenterY = size.height / 2;
+    final canvasCenterY = canvasHeight / 2;
     //print('height: ${size.height}');
 
     _drawAltitudeLine(canvas, size, planetPainter);
@@ -69,8 +69,11 @@ class SkyPainter extends CustomPainter {
       if (adjustedX < 0) {
         adjustedX += canvasWidth;
       }
-      double adjustedY = canvasCenterY - (body.coords.dy / 180.0 * size.height);
+      double adjustedY =
+          canvasCenterY - (body.coords.dy / 180.0 * canvasHeight);
       Offset position = Offset(adjustedX, adjustedY);
+
+      body.adjustedCoords = position;
       canvas.drawCircle(position, 5, planetPainter);
 
       textPainter.text = TextSpan(

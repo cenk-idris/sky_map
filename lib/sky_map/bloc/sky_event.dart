@@ -17,3 +17,9 @@ class FetchCelestialData extends SkyEvent {
 
   FetchCelestialData(this.position);
 }
+
+class TapOnCelestialBody extends SkyEvent {
+  final Offset tapPosition;
+
+  TapOnCelestialBody(this.tapPosition);
+}
