@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_compass/flutter_compass.dart';
-import 'package:motion_sensors/motion_sensors.dart';
+
 import 'package:sky_map/sky_map/bloc/sky_bloc.dart';
 import 'package:sky_map/sky_map/bloc/sky_event.dart';
-import 'package:sky_map/sky_map/constants.dart';
+
 import 'package:sky_map/sky_map/widgets/sky_painter.dart';
 
 import '../bloc/sky_state.dart';

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:geolocator/geolocator.dart';
 
 import '../models/celestial_body_model.dart';

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sky_map/sky_map/bloc/sky_event.dart';
@@ -8,7 +6,6 @@ import 'package:sky_map/sky_map/services/bodies_api_service.dart';
 import 'package:sky_map/sky_map/services/location_service.dart';
 import 'package:sky_map/sky_map/services/stars_api_service.dart';
 
-import '../constants.dart';
 import '../models/celestial_body_model.dart';
 import '../models/star_model.dart';
 
@@ -29,13 +26,13 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
 
   void _onTapOnCelestialBody(
       TapOnCelestialBody event, Emitter<SkyState> emit) async {
-    CelestialBody? tappedBody;
-    print(event.tapPosition);
+    //CelestialBody? tappedBody;
+    //print(event.tapPosition);
 
     for (var body in _celestialBodies) {
-      print('${body.name}: ${body.adjustedCoords}');
+      //print('${body.name}: ${body.adjustedCoords}');
       if ((body.adjustedCoords - event.tapPosition).distance < 20) {
-        print('Tapped on ${body.name}');
+        //print('Tapped on ${body.name}');
         emit(SkyCelestialBodyTapped(body));
       }
     }
@@ -50,8 +47,8 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
       if (position != null) {
         final now = DateTime.now().toUtc();
         localSiderealTime = calculateLST(now, position!.longitude);
-        print('Local Sidereal Time: $localSiderealTime');
-        print('Position: $position');
+        // print('Local Sidereal Time: $localSiderealTime');
+        // print('Position: $position');
         add(FetchCelestialData(position!));
       } else {
         throw Exception('Position empty');
@@ -74,6 +71,7 @@ class SkyBloc extends Bloc<SkyEvent, SkyState> {
 
       /////////// For printing stars and celestial bodies ////////////////
       for (var star in starList) {
+        // ignore_for_file: avoid_print
         print(
             'Stars name: ${star.name}, constell: ${star.constellation}, RA: ${star.rightAscensionHours}, DEC: ${star.declinationDegrees}, apMag: ${star.apparentMagnitude}, distLightYear: ${star.distanceLightYear}');
       }
